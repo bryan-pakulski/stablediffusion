@@ -60,10 +60,10 @@ class T2ISampler(BaseSampler):
         prompts_batch = [prompt for _ in range(bsz)]
 
         prior_cf_scales_batch = [self._prior_cf_scale] * len(prompts_batch)
-        prior_cf_scales_batch = torch.tensor(prior_cf_scales_batch, device="cuda")
+        prior_cf_scales_batch = torch.tensor(prior_cf_scales_batch, device="cuda" if torch.cuda.is_available() else "cpu")
 
         decoder_cf_scales_batch = [self._decoder_cf_scale] * len(prompts_batch)
-        decoder_cf_scales_batch = torch.tensor(decoder_cf_scales_batch, device="cuda")
+        decoder_cf_scales_batch = torch.tensor(decoder_cf_scales_batch, device="cuda" if torch.cuda.is_available() else "cpu")
 
         """ Get CLIP text feature """
         clip_model = self._clip
@@ -79,7 +79,7 @@ class T2ISampler(BaseSampler):
         tok = torch.cat([tok, cf_token], dim=0)
         mask = torch.cat([mask, cf_mask], dim=0)
 
-        tok, mask = tok.to(device="cuda"), mask.to(device="cuda")
+        tok, mask = tok.to(device="cuda" if torch.cuda.is_available() else "cpu"), mask.to(device="cuda" if torch.cuda.is_available() else "cpu")
         txt_feat, txt_feat_seq = clip_model.encode_text(tok)
 
         return (
@@ -207,10 +207,10 @@ class PriorSampler(BaseSampler):
         prompts_batch = [prompt for _ in range(bsz)]
 
         prior_cf_scales_batch = [self._prior_cf_scale] * len(prompts_batch)
-        prior_cf_scales_batch = torch.tensor(prior_cf_scales_batch, device="cuda")
+        prior_cf_scales_batch = torch.tensor(prior_cf_scales_batch, device="cuda" if torch.cuda.is_available() else "cpu")
 
         decoder_cf_scales_batch = [self._decoder_cf_scale] * len(prompts_batch)
-        decoder_cf_scales_batch = torch.tensor(decoder_cf_scales_batch, device="cuda")
+        decoder_cf_scales_batch = torch.tensor(decoder_cf_scales_batch, device="cuda" if torch.cuda.is_available() else "cpu")
 
         """ Get CLIP text feature """
         clip_model = self._clip
@@ -226,7 +226,7 @@ class PriorSampler(BaseSampler):
         tok = torch.cat([tok, cf_token], dim=0)
         mask = torch.cat([mask, cf_mask], dim=0)
 
-        tok, mask = tok.to(device="cuda"), mask.to(device="cuda")
+        tok, mask = tok.to(device="cuda" if torch.cuda.is_available() else "cpu"), mask.to(device="cuda" if torch.cuda.is_available() else "cpu")
         txt_feat, txt_feat_seq = clip_model.encode_text(tok)
 
         return (
