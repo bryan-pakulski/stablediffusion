@@ -8,13 +8,13 @@ class UniPCSampler(object):
     def __init__(self, model, **kwargs):
         super().__init__()
         self.model = model
-        to_torch = lambda x: x.clone().detach().to(torch.float32).to(model.device)
+        to_torch = lambda x: x.clone().detach().to(torch.float32).to("cuda" if torch.cuda.is_available() else "cpu")
         self.register_buffer('alphas_cumprod', to_torch(model.alphas_cumprod))
 
     def register_buffer(self, name, attr):
         if type(attr) == torch.Tensor:
-            if attr.device != torch.device("cuda"):
-                attr = attr.to(torch.device("cuda"))
+            if attr.device != torch.device("cuda" if torch.cuda.is_available() else "cpu"):
+                attr = attr.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
         setattr(self, name, attr)
 
     @torch.no_grad()
@@ -55,7 +55,7 @@ class UniPCSampler(object):
         C, H, W = shape
         size = (batch_size, C, H, W)
 
-        device = self.model.betas.device
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         if x_T is None:
             img = torch.randn(size, device=device)
         else:
